@@ -29,7 +29,7 @@ def parse_opcode(value):
     return mode3, mode2, mode1, value
 
 
-def execute(program, input, output_callback):
+def execute(program, input_callback, output_callback):
     ip = 0
     output = None
     program = program[:]
@@ -51,8 +51,7 @@ def execute(program, input, output_callback):
         # Opcode 3 takes a single integer as input and saves it to the position given by its only parameter. For example, the instruction 3,50 would take an input value and store it at address 50.
         elif opcode == 3:
             A = program[ip + 1]
-            program[A] = input()
-            # print("get input", program[A])
+            program[A] = input_callback()
             ip += 2
 
         # Opcode 4 outputs the value of its only parameter. For example, the instruction 4,50 would output the value at address 50.
