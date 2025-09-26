@@ -29,9 +29,10 @@ def parse_opcode(value):
     return mode3, mode2, mode1, value
 
 
-def execute(program, input):
+def execute(program, input, output_callback):
     ip = 0
     output = None
+    program = program[:]
     while 0 <= ip < len(program):
         mode3, mode2, mode1, opcode = parse_opcode(program[ip])
         if opcode == 99:
@@ -50,13 +51,15 @@ def execute(program, input):
         # Opcode 3 takes a single integer as input and saves it to the position given by its only parameter. For example, the instruction 3,50 would take an input value and store it at address 50.
         elif opcode == 3:
             A = program[ip + 1]
-            program[A] = input
+            program[A] = input()
+            # print("get input", program[A])
             ip += 2
 
         # Opcode 4 outputs the value of its only parameter. For example, the instruction 4,50 would output the value at address 50.
         elif opcode == 4:
             A = program[program[ip + 1]] if mode1 == 0 else program[ip + 1]
             output = A
+            output_callback(output)
             ip += 2
 
         # Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
@@ -106,12 +109,12 @@ def execute(program, input):
 
 
 def part1():
-    print(execute(program, 1))
+    print(execute(program, lambda: 1, lambda v: v))
 
 
 def part2():
-    print(execute(program, 5))
+    print(execute(program, lambda: 5, lambda v: v))
 
 
-part1()
-part2()
+# part1()
+# part2()
