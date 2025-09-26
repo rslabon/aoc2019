@@ -8,14 +8,12 @@ with open("./resources/day7.txt") as f:
     program = [int(c) for c in f.read().strip().split(",")]
 
 
+def amplifier(program, input_queue, output_queue):
+    execute(program[:], lambda: input_queue.get(), lambda v: output_queue.put(v))
+    input_queue.task_done()
+
+
 def compute_thruster_signal(program, phase):
-    program = program[:]
-
-    def amplifier(input_queue, output_queue):
-        nonlocal program
-        execute(program[:], lambda: input_queue.get(), lambda v: output_queue.put(v))
-        input_queue.task_done()
-
     qa = queue.Queue()
     qa.put(phase[0])
     qa.put(0)
@@ -30,11 +28,11 @@ def compute_thruster_signal(program, phase):
 
     final = queue.Queue()
 
-    A = threading.Thread(target=amplifier, args=(qa, qb), daemon=True)
-    B = threading.Thread(target=amplifier, args=(qb, qc), daemon=True)
-    C = threading.Thread(target=amplifier, args=(qc, qd), daemon=True)
-    D = threading.Thread(target=amplifier, args=(qd, qe), daemon=True)
-    E = threading.Thread(target=amplifier, args=(qe, final), daemon=True)
+    A = threading.Thread(target=amplifier, args=(program, qa, qb), daemon=True)
+    B = threading.Thread(target=amplifier, args=(program, qb, qc), daemon=True)
+    C = threading.Thread(target=amplifier, args=(program, qc, qd), daemon=True)
+    D = threading.Thread(target=amplifier, args=(program, qd, qe), daemon=True)
+    E = threading.Thread(target=amplifier, args=(program, qe, final), daemon=True)
 
     for t in [A, B, C, D, E]:
         t.start()
@@ -48,13 +46,6 @@ def compute_thruster_signal(program, phase):
 
 
 def compute_thruster_signal_with_feedback(program, phase):
-    program = program[:]
-
-    def amplifier(input_queue, output_queue):
-        nonlocal program
-        execute(program[:], lambda: input_queue.get(), lambda v: output_queue.put(v))
-        input_queue.task_done()
-
     qa = queue.Queue()
     qb = queue.Queue()
     qc = queue.Queue()
@@ -68,11 +59,11 @@ def compute_thruster_signal_with_feedback(program, phase):
     qd.put(phase[3])
     qe.put(phase[4])
 
-    A = threading.Thread(target=amplifier, args=(qa, qb), daemon=True)
-    B = threading.Thread(target=amplifier, args=(qb, qc), daemon=True)
-    C = threading.Thread(target=amplifier, args=(qc, qd), daemon=True)
-    D = threading.Thread(target=amplifier, args=(qd, qe), daemon=True)
-    E = threading.Thread(target=amplifier, args=(qe, qa), daemon=True)
+    A = threading.Thread(target=amplifier, args=(program, qa, qb), daemon=True)
+    B = threading.Thread(target=amplifier, args=(program, qb, qc), daemon=True)
+    C = threading.Thread(target=amplifier, args=(program, qc, qd), daemon=True)
+    D = threading.Thread(target=amplifier, args=(program, qd, qe), daemon=True)
+    E = threading.Thread(target=amplifier, args=(program, qe, qa), daemon=True)
 
     for t in [A, B, C, D, E]:
         t.start()
