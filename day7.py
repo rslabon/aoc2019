@@ -13,7 +13,7 @@ def amplifier(program, input_queue, output_queue):
     input_queue.task_done()
 
 
-def compute_thruster_signal(program, phase):
+def compute_thruster_signal(program, phase, loop=False):
     qa = queue.Queue()
     qa.put(phase[0])
     qa.put(0)
@@ -27,6 +27,8 @@ def compute_thruster_signal(program, phase):
     qe.put(phase[4])
 
     final = queue.Queue()
+    if loop:
+        final = qa
 
     A = threading.Thread(target=amplifier, args=(program, qa, qb), daemon=True)
     B = threading.Thread(target=amplifier, args=(program, qb, qc), daemon=True)
@@ -45,38 +47,6 @@ def compute_thruster_signal(program, phase):
     return value
 
 
-def compute_thruster_signal_with_feedback(program, phase):
-    qa = queue.Queue()
-    qb = queue.Queue()
-    qc = queue.Queue()
-    qd = queue.Queue()
-    qe = queue.Queue()
-
-    qa.put(phase[0])
-    qa.put(0)
-    qb.put(phase[1])
-    qc.put(phase[2])
-    qd.put(phase[3])
-    qe.put(phase[4])
-
-    A = threading.Thread(target=amplifier, args=(program, qa, qb), daemon=True)
-    B = threading.Thread(target=amplifier, args=(program, qb, qc), daemon=True)
-    C = threading.Thread(target=amplifier, args=(program, qc, qd), daemon=True)
-    D = threading.Thread(target=amplifier, args=(program, qd, qe), daemon=True)
-    E = threading.Thread(target=amplifier, args=(program, qe, qa), daemon=True)
-
-    for t in [A, B, C, D, E]:
-        t.start()
-
-    for t in [A, B, C, D, E]:
-        t.join()
-
-    value = qa.get()
-    qa.task_done()
-
-    return value
-
-
 def part1():
     max_thruster_signal = float("-inf")
     for phase in permutations([0, 1, 2, 3, 4], 5):
@@ -89,7 +59,7 @@ def part1():
 def part2():
     max_thruster_signal = float("-inf")
     for phase in permutations([5, 6, 7, 8, 9], 5):
-        thruster_signal = compute_thruster_signal_with_feedback(program, phase)
+        thruster_signal = compute_thruster_signal(program, phase, True)
         max_thruster_signal = max(max_thruster_signal, thruster_signal)
 
     print(max_thruster_signal)
