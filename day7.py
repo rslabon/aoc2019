@@ -53,7 +53,7 @@ def part1():
         thruster_signal = compute_thruster_signal(program, phase)
         max_thruster_signal = max(max_thruster_signal, thruster_signal)
 
-    print(max_thruster_signal)
+    assert max_thruster_signal == 14902
 
 
 def part2():
@@ -62,7 +62,7 @@ def part2():
         thruster_signal = compute_thruster_signal(program, phase, True)
         max_thruster_signal = max(max_thruster_signal, thruster_signal)
 
-    print(max_thruster_signal)
+    assert max_thruster_signal == 6489132
 
 
 part1()
