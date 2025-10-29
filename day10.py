@@ -154,11 +154,6 @@ def distance(p1, p2):
     return math.hypot(x2 - x1, y2 - y1)
 
 
-# .#....###24...#..
-# ##...##.13#67..9#
-# ##...#...5.8####.
-# ..#.....X...###..
-# ..#.#.....#....##
 def find_angle(laser, asteroid):
     lx, ly = laser
     ax, ay = asteroid
