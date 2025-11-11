@@ -13,6 +13,7 @@ def play():
     paddle = None
 
     def get_input():
+        nonlocal ball, paddle
         if ball and paddle:
             if paddle[0] < ball[0]:
                 return 1
