@@ -3,11 +3,11 @@ from day5 import execute
 with open("./resources/day13.txt") as f:
     program = [int(c) for c in f.read().strip().split(",")]
 
+
 def play():
     data = program[:]
     data[0] = 2
     buffer = []
-    grid = {}
     score = 0
     ball = None
     paddle = None
@@ -22,7 +22,7 @@ def play():
         return 0
 
     def handle_output(v):
-        nonlocal ball, paddle, buffer, score, grid
+        nonlocal ball, paddle, buffer, score
         buffer.append(v)
         if len(buffer) == 3:
             x = buffer[0]
@@ -31,7 +31,6 @@ def play():
             if x == -1 and y == 0:
                 score = max(score, id)
 
-            grid[(x, y)] = id
             buffer = []
             if id == 3:
                 paddle = (x, y)
@@ -39,7 +38,8 @@ def play():
                 ball = (x, y)
 
     execute(data, get_input, handle_output)
-    return 2 not in grid.values(), score
+    return score
+
 
 def part1():
     output = []
@@ -54,11 +54,7 @@ def part1():
 
 
 def part2():
-    finished = False
-    score = 0
-    while not finished:
-        finished, score = play()
-
+    score = play()
     assert score == 10292
 
 
