@@ -1,3 +1,4 @@
+import math
 import re
 from collections import defaultdict
 
@@ -21,8 +22,8 @@ data = """
 5 BHXH, 4 VRPVC => 5 LTCX
 """.strip().splitlines()
 
-# with open("./resources/day14.txt") as f:
-#     data = f.read().strip().splitlines()
+with open("./resources/day14.txt") as f:
+    data = f.read().strip().splitlines()
 
 complex_reactions = {}
 for line in data:
@@ -37,23 +38,30 @@ for line in data:
     complex_reactions[output_name] = output_value, inputs
 
 
-def create(name, complex_reactions, stock):
+def produce(name, required, complex_reactions, stock):
     if name == "ORE":
-        stock["ORE"] += 1
-        stock["TOTAL_ORE"] += 1
+        if stock[name] < required:
+            missing = required - stock[name]
+            stock["ORE"] += missing
+            stock["TOTAL_ORE"] += missing
+
+        stock["ORE"] -= required
+        return
+
+    if stock[name] >= required:
+        stock[name] -= required
         return
 
     output_value, inputs = complex_reactions[name]
+    n = 1
+
+    if required - stock[name] > output_value:
+        n = math.ceil((required - stock[name]) / output_value)
+
     for input_name, input_value in inputs:
-        produce(input_name, input_value, complex_reactions, stock)
+        produce(input_name, input_value * n, complex_reactions, stock)
 
-    stock[name] += output_value
-
-
-def produce(name, required, complex_reactions, stock):
-    while stock[name] < required:
-        create(name, complex_reactions, stock)
-    stock[name] -= required
+    stock[name] += n * output_value - required
 
 
 def part1():
@@ -63,17 +71,16 @@ def part1():
 
 
 def part2():
-    stock = defaultdict(lambda: 0)
-    fuel = 0
+    fuel = 2269000
     while True:
-        produce("FUEL", 1, complex_reactions, stock)
-        if stock["TOTAL_ORE"] <= 1000000000000:
-            fuel += 1
-            print("FUEL", fuel, 1000000000000 - stock["TOTAL_ORE"])
-        else:
+        stock = defaultdict(lambda: 0)
+        produce("FUEL", fuel + 1, complex_reactions, stock)
+        if 1000000000000 - stock["TOTAL_ORE"] < 0:
             break
-    print(fuel)
+        fuel += 1
+
+    assert fuel == 2269325
 
 
-# part1()
+part1()
 part2()
