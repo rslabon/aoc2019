@@ -70,14 +70,23 @@ def part1():
     assert stock["TOTAL_ORE"] == 598038
 
 
+def get_ore(fuel):
+    stock = defaultdict(lambda: 0)
+    produce("FUEL", fuel, complex_reactions, stock)
+    return stock["TOTAL_ORE"]
+
+
 def part2():
-    fuel = 2269000
+    fuel = 1
+    n = 1_000_000
     while True:
-        stock = defaultdict(lambda: 0)
-        produce("FUEL", fuel + 1, complex_reactions, stock)
-        if 1000000000000 - stock["TOTAL_ORE"] < 0:
-            break
-        fuel += 1
+        v = 1000000000000 - get_ore(fuel + n)
+        if v < 0:
+            if n == 1:
+                break
+            n /= 10
+            continue
+        fuel += n
 
     assert fuel == 2269325
 
