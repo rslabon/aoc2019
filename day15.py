@@ -49,6 +49,8 @@ def print_grid():
                 print("#", end="")
             elif grid[(x, y)] == 1:
                 print(".", end="")
+            elif grid[(x, y)] == 2:
+                print("O", end="")
         print()
 
 
@@ -58,9 +60,7 @@ def movement():
 
 
 def random_direction():
-    d = [1, 2, 3, 4]
-    random.shuffle(d)
-    return d[0]
+    return random.randint(1, 4)
 
 
 def has_finished():
@@ -85,26 +85,18 @@ def status(value):
     if has_finished():
         raise END()
 
-    if value == 0:
-        for d in [1, 2, 3, 4]:
-            next_pos = get_next_pos(d, pos)
-            if next_pos not in grid:
-                dir = d
-                return
-
-        dir = random_direction()
-    else:
+    if value != 0:
         pos = next_pos
         if value == 2:
             target = pos
 
-        for d in [1, 2, 3, 4]:
-            next_pos = get_next_pos(d, pos)
-            if next_pos not in grid:
-                dir = d
-                return
+    for d in [1, 2, 3, 4]:
+        next_pos = get_next_pos(d, pos)
+        if next_pos not in grid:
+            dir = d
+            return
 
-        dir = random_direction()
+    dir = random_direction()
 
 
 def fill_grid():
@@ -114,9 +106,10 @@ def fill_grid():
         return
 
 
+fill_grid()
+
+
 def part1():
-    fill_grid()
-    print_grid()
     q = deque([(1, (0, 0), 0)])
     seen = set()
     movements = None
@@ -138,4 +131,32 @@ def part1():
     assert movements == 282
 
 
+def adj(pos):
+    result = []
+    for d in [1, 2, 3, 4]:
+        next_pos = get_next_pos(d, pos)
+        if next_pos in grid and grid[next_pos] == 1:
+            result.append(next_pos)
+
+    return result
+
+
+def part2():
+    q = [target]
+    next_q = []
+    time = -1
+
+    while 1 in grid.values():
+        for pos in q:
+            grid[pos] = 2
+            next_q += adj(pos)
+
+        q = next_q
+        next_q = []
+        time += 1
+
+    assert time == 286
+
+
 part1()
+part2()
