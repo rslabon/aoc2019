@@ -125,7 +125,7 @@ def find_patterns(s, patterns=[]):
 
     for i in range(min(5, len(s)), min(19, len(s))):
         p = s[0:i]
-        if p[0] not in ["R", "L"] and p[-1] in [",", "R", "L"]:
+        if p[0] not in ["R", "L"] or p[-1] in [",", "R", "L"]:
             continue
 
         ss = s[:]
