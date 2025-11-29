@@ -119,7 +119,7 @@ def find_path(program):
 
 def part2():
     path = find_path(program)
-    # print(path)
+    print(",".join(map(str, path)))
 
     # analyzed path manually
 
