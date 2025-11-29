@@ -117,23 +117,39 @@ def find_path(program):
     return path
 
 
+def find_patterns(s, patterns=[]):
+    if len(patterns) > 3:
+        return None
+    if not s and len(patterns) == 3:
+        return patterns
+
+    for i in range(min(5, len(s)), min(19, len(s))):
+        p = s[0:i]
+        if p[0] not in ["R", "L"] and p[-1] in [",", "R", "L"]:
+            continue
+
+        ss = s[:]
+        ss = ss.replace(p + ",", "")
+        ss = ss.replace(p, "")
+        r = find_patterns(ss, patterns + [p])
+        if r:
+            return r
+
+    return None
+
+
 def part2():
     path = find_path(program)
-    print(",".join(map(str, path)))
-
-    # analyzed path manually
-
-    # [A,B,A,B,C,A,B,C,A,C]
-    # A: R,6,L,10,R,8
-    # B: R,8,R,12,L,8,L,8
-    # C: L,10,R,6,R,6,L,8
+    s = ",".join(map(str, path))
+    A, B, C = find_patterns(s)
+    main = s.replace(A, "A").replace(B, "B").replace(C, "C")
 
     index = 0
     input_data = []
-    input_data += as_ascii("A,B,A,B,C,A,B,C,A,C")
-    input_data += as_ascii("R,6,L,10,R,8")
-    input_data += as_ascii("R,8,R,12,L,8,L,8")
-    input_data += as_ascii("L,10,R,6,R,6,L,8")
+    input_data += as_ascii(main)
+    input_data += as_ascii(A)
+    input_data += as_ascii(B)
+    input_data += as_ascii(C)
     input_data += as_ascii("n")
 
     copy_program = program[:]
@@ -146,7 +162,8 @@ def part2():
         return value
 
     _, dust = create_grid(copy_program, get_input)
-    print(dust)
+
+    assert dust == 1155497
 
 
 part1()
