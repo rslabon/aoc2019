@@ -1,4 +1,4 @@
-from collections import defaultdict, deque
+from collections import deque
 
 from day9 import execute
 
@@ -60,22 +60,17 @@ def as_ascii(s):
 def find_path(program):
     grid, _ = create_grid(program)
     robot = None
-    scaffold = set()
     for row_index, row in enumerate(grid):
         for col_index, col in enumerate(row):
             if col in [">", "<", "^", "v"]:
                 robot = row_index, col_index
-                scaffold.add((row_index, col_index))
-            if col == "#":
-                scaffold.add((row_index, col_index))
 
     robot_dir = grid[robot[0]][robot[1]]
-    seen = defaultdict(int)
-    q = deque([(robot, robot_dir, [], set(scaffold) - {robot}, seen)])
+    q = deque([(robot, robot_dir, [])])
     grid[robot[0]][robot[1]] = "#"
     path = None
     while q:
-        robot, robot_dir, path, left, seen = q.popleft()
+        robot, robot_dir, path = q.popleft()
         robot_row, robot_col = robot
         next_moves = []
         for r, c, next_dir in [(1, 0, "v"), (0, 1, ">"), (-1, 0, "^"), (0, -1, "<")]:
@@ -97,35 +92,27 @@ def find_path(program):
 
             if robot_dir == "^" and next_dir == ">":
                 new_path.append("R")
-                new_path.append(n)
             elif robot_dir == ">" and next_dir == "v":
                 new_path.append("R")
-                new_path.append(n)
             elif robot_dir == "v" and next_dir == "<":
                 new_path.append("R")
-                new_path.append(n)
             elif robot_dir == "<" and next_dir == "^":
                 new_path.append("R")
-                new_path.append(n)
 
             elif robot_dir == "^" and next_dir == "<":
                 new_path.append("L")
-                new_path.append(n)
             elif robot_dir == "<" and next_dir == "v":
                 new_path.append("L")
-                new_path.append(n)
             elif robot_dir == "v" and next_dir == ">":
                 new_path.append("L")
-                new_path.append(n)
             elif robot_dir == ">" and next_dir == "^":
                 new_path.append("L")
-                new_path.append(n)
             else:
                 # back moves like > < or ^ v
                 continue
 
-            new_seen = seen.copy()
-            q.append(((next_row, next_col), next_dir, new_path, left - {(next_row, next_col)}, new_seen))
+            new_path.append(n)
+            q.append(((next_row, next_col), next_dir, new_path))
 
     return path
 
