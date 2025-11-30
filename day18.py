@@ -167,7 +167,6 @@ def part2():
 
         if collected_door_keys == door_keys.keys():
             min_steps = min(steps, min_steps)
-            print(min_steps)
             continue
 
         nkeys = nearest_keys(grid, r1, collected_door_keys)
