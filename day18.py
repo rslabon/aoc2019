@@ -134,4 +134,68 @@ def part1():
     assert min_steps == 4830
 
 
+def part2():
+    grid[entrance[0]][entrance[1]] = "#"
+    grid[entrance[0] + 1][entrance[1]] = "#"
+    grid[entrance[0] - 1][entrance[1]] = "#"
+    grid[entrance[0]][entrance[1] - 1] = "#"
+    grid[entrance[0]][entrance[1] + 1] = "#"
+
+    r1 = (entrance[0] - 1, entrance[1] - 1)
+    r2 = (entrance[0] + 1, entrance[1] - 1)
+    r3 = (entrance[0] - 1, entrance[1] + 1)
+    r4 = (entrance[0] + 1, entrance[1] + 1)
+    grid[r1[0]][r1[1]] = "@"
+    grid[r2[0]][r2[1]] = "@"
+    grid[r3[0]][r3[1]] = "@"
+    grid[r4[0]][r4[1]] = "@"
+
+    q = [(0, 0, (r1, r2, r3, r4), 0, set())]
+    heapq.heapify(q)
+    min_steps = float("inf")
+    seen = set()
+
+    while q:
+        _, _, (r1, r2, r3, r4), steps, collected_door_keys = heapq.heappop(q)
+
+        if ((r1, r2, r3, r4), steps, tuple(collected_door_keys)) in seen:
+            continue
+        seen.add(((r1, r2, r3, r4), steps, tuple(collected_door_keys)))
+
+        if steps >= min_steps:
+            continue
+
+        if collected_door_keys == door_keys.keys():
+            min_steps = min(steps, min_steps)
+            print(min_steps)
+            continue
+
+        nkeys = nearest_keys(grid, r1, collected_door_keys)
+        for name, key_position, key_steps in nkeys:
+            new_collected = collected_door_keys | {name}
+            next_steps = steps + key_steps
+            heapq.heappush(q, (-len(new_collected), next_steps, (key_position, r2, r3, r4), next_steps, new_collected))
+
+        nkeys = nearest_keys(grid, r2, collected_door_keys)
+        for name, key_position, key_steps in nkeys:
+            new_collected = collected_door_keys | {name}
+            next_steps = steps + key_steps
+            heapq.heappush(q, (-len(new_collected), next_steps, (r1, key_position, r3, r4), next_steps, new_collected))
+
+        nkeys = nearest_keys(grid, r3, collected_door_keys)
+        for name, key_position, key_steps in nkeys:
+            new_collected = collected_door_keys | {name}
+            next_steps = steps + key_steps
+            heapq.heappush(q, (-len(new_collected), next_steps, (r1, r2, key_position, r4), next_steps, new_collected))
+
+        nkeys = nearest_keys(grid, r4, collected_door_keys)
+        for name, key_position, key_steps in nkeys:
+            new_collected = collected_door_keys | {name}
+            next_steps = steps + key_steps
+            heapq.heappush(q, (-len(new_collected), next_steps, (r1, r2, r3, key_position), next_steps, new_collected))
+
+    assert min_steps == 1946
+
+
 part1()
+part2()
