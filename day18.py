@@ -106,6 +106,9 @@ def nearest_keys(grid, position, collected_door_keys=set()):
 
 
 def part1():
+    global cache
+    cache = {}
+
     q = [(0, 0, entrance, 0, set())]
     heapq.heapify(q)
     min_steps = float("inf")
@@ -135,6 +138,9 @@ def part1():
 
 
 def part2():
+    global cache
+    cache = {}
+
     grid[entrance[0]][entrance[1]] = "#"
     grid[entrance[0] + 1][entrance[1]] = "#"
     grid[entrance[0] - 1][entrance[1]] = "#"
