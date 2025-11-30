@@ -54,10 +54,8 @@ for row_index, line in enumerate(data.split("\n")):
             entrance = (row_index, column_index)
         if 97 <= ord(value) <= 122:
             door_keys[value] = (row_index, column_index)
-            # keys[(row_index, column_index)] = value
         if 65 <= ord(value) <= 90:
             doors[value] = (row_index, column_index)
-            # doors[(row_index, column_index)] = value
 
 
 def print_grid(grid):
@@ -70,7 +68,7 @@ def print_grid(grid):
 cache = {}
 
 
-def nearest_keys(grid, door_keys, doors, position, collected_door_keys=set()):
+def nearest_keys(grid, position, collected_door_keys=set()):
     cache_key = (position, tuple(collected_door_keys))
     if cache_key in cache:
         return cache[cache_key]
@@ -90,13 +88,14 @@ def nearest_keys(grid, door_keys, doors, position, collected_door_keys=set()):
             if 0 <= nr < len(grid) and 0 <= nc < len(grid[0]):
                 if (nr, nc) in seen:
                     continue
+
                 if grid[nr][nc] != "#":
-                    not_collected_key = grid[nr][nc] in door_keys and grid[nr][nc] not in collected_door_keys
+                    not_collected_key = grid[nr][nc].islower() and grid[nr][nc] not in collected_door_keys
                     if not_collected_key:
                         result.add((grid[nr][nc], (nr, nc), steps + 1))
                         continue
 
-                    door_without_key = grid[nr][nc] in doors and grid[nr][nc].lower() not in collected_door_keys
+                    door_without_key = grid[nr][nc].isupper() and grid[nr][nc].lower() not in collected_door_keys
                     if door_without_key:
                         continue
 
@@ -126,7 +125,7 @@ def part1():
             min_steps = min(steps, min_steps)
             continue
 
-        nkeys = nearest_keys(grid, door_keys, doors, position, collected_door_keys)
+        nkeys = nearest_keys(grid, position, collected_door_keys)
         for name, key_position, key_steps in nkeys:
             new_collected = collected_door_keys | {name}
             next_steps = steps + key_steps
