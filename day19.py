@@ -1,5 +1,3 @@
-from collections import Counter
-
 from day5 import execute
 
 with open("resources/day19.txt") as f:
@@ -25,17 +23,49 @@ def check_position(x, y):
 
 
 def scan(width, height):
-    grid = {}
+    points = set()
+    rows = []
     for y in range(height):
-        for x in range(width):
-            grid[(x, y)] = check_position(x, y)
-    return grid
+        row = []
+        offset = 0 if len(rows) == 0 else rows[-1][0][0]
+        for x in range(offset, width):
+            v = check_position(x, y)
+            if v == 1:
+                row.append((x, y))
+                points.add((x, y))
+            elif v == 0 and len(row) > 0:
+                break
+        if row:
+            rows.append(row)
+    return rows, points
 
 
 def part1():
-    grid = scan(50, 50)
-    affected_points = Counter(grid.values())[1]
-    assert affected_points == 189
+    _, points = scan(50, 50)
+    assert len(points) == 189
+
+
+def find_square(square_size, rows, points):
+    for row in rows:
+        if len(row) < square_size:
+            continue
+        for (x, y) in row:
+            if (x + square_size - 1, y) in points \
+                    and (x, y + square_size - 1) in points \
+                    and (x + square_size - 1, y + square_size - 1) in points:
+                return (x, y)
+
+    return None
+
+
+def part2():
+    size = 1200
+    square = 100
+    rows, points = scan(size, size)
+    start = find_square(square, rows, points)
+    result = start[0] * 10_000 + start[1]
+    assert result == 7621042
 
 
 part1()
+part2()
