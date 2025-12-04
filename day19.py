@@ -62,8 +62,8 @@ def part2():
     size = 1200
     square = 100
     rows, points = scan(size, size)
-    start = find_square(square, rows, points)
-    result = start[0] * 10_000 + start[1]
+    (x, y) = find_square(square, rows, points)
+    result = x * 10_000 + y
     assert result == 7621042
 
 
