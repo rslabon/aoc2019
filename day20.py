@@ -1,6 +1,5 @@
 import re
 from collections import defaultdict, deque
-from urllib.parse import to_bytes
 
 data = """
          A           
@@ -104,8 +103,8 @@ RE....#.#                           #......RF
                A A D   M                     
 """
 
-# with open('resources/day20.txt') as f:
-#     data = f.read()
+with open('resources/day20.txt') as f:
+    data = f.read()
 
 lines = [line for line in data.split("\n") if line]
 
@@ -220,7 +219,7 @@ def part1():
                 continue
             q.append((next_position, set(seen), steps + 1))
 
-    assert min_steps == 23
+    assert min_steps == 656
 
 
 def is_blocked(level, portals_name, portals_type, passages, to_position, from_position):
@@ -251,58 +250,21 @@ def part2():
     position_teleports, portals_by_name, portals_type, portals_name = find_teleports(lines)
     start = portals_by_name["AA"][0]
     target = portals_by_name["ZZ"][0]
-    min_steps = float("inf")
-    q = deque([(start, 0, set(), 0, [])])
+    min_steps = 8000
+    q = deque([(start, 0, set(), 0)])
 
     while q:
-        position, level, seen, steps, path = q.popleft()
+        position, level, seen, steps = q.popleft()
         if steps > min_steps:
             continue
-        path.append((portals_name[position] if position in portals_name else '', position, level))
 
         if level < 0:
             continue
         if position == target and level == 0:
-            min_steps = min(min_steps, steps)
-            print("FOUND", min_steps)
-            l = 0
-            c = 0
-            s = path[0][0]
-            q = deque(path)
-            pp = []
-            while q:
-                n, p, ll = q.popleft()
-                pp.append(p)
-                if ll == l:
-                    c += 1
-                else:
-                    print(f"Walk from {s} to {n} ({c} steps)")
-                    # for row, line in enumerate(lines):
-                    #     for col, c in enumerate(line):
-                    #         if (row, col) in pp:
-                    #             print("O", end="")
-                    #         else:
-                    #             print(c, end="")
-                    #     print()
-                    # print("*" * 50)
-
-                    l = ll
-                    s = n
-                    c = 0
-                    pp = [p]
-            print(f"Walk from {s} to {n} ({c} steps)")
-            # for row, line in enumerate(lines):
-            #     for col, c in enumerate(line):
-            #         if (row, col) in pp:
-            #             print("O", end="")
-            #         else:
-            #             print(c, end="")
-            #     print()
-            # print("*" * 50)
-
+            min_steps = steps
+            break
+        if (position, level) in seen:
             continue
-        # if (position, level) in seen:
-        #     continue
 
         seen.add((position, level))
 
@@ -315,20 +277,28 @@ def part2():
         for next_position in [(px + 0, py + 1), (px + 0, py - 1), (px + 1, py + 0), (px - 1, py + 0)] + portals:
             if is_blocked(level, portals_name, portals_type, passages, next_position, position):
                 continue
-            # elif (next_position, level) in seen:
-            #     continue
             elif level == 0 and next_position in portals_name and portals_name[next_position] in ["AA", "ZZ"]:
-                q.append((next_position, level, set(seen), steps + 1, path[:]))
+                if (next_position, level) in seen:
+                    continue
+                q.append((next_position, level, set(seen), steps + 1))
             elif position in portals_name and next_position in portals_name:
                 from_portal = portals_type[position]
                 to_type = portals_type[next_position]
                 if from_portal == "inner" and to_type == "outer":
-                    q.append((next_position, level + 1, set(seen), steps + 1, path[:]))
+                    if (next_position, level + 1) in seen:
+                        continue
+                    q.append((next_position, level + 1, {(position, level)}, steps + 1))
                 if from_portal == "outer" and to_type == "inner":
-                    q.append((next_position, level - 1, set(seen), steps + 1, path[:]))
+                    if (next_position, level - 1) in seen:
+                        continue
+                    q.append((next_position, level - 1, {(position, level)}, steps + 1))
             else:
-                q.append((next_position, level, set(seen), steps + 1, path[:]))
+                if (next_position, level) in seen:
+                    continue
+                q.append((next_position, level, set(seen), steps + 1))
+
+    assert min_steps == 7114
 
 
-# part1()
+part1()
 part2()
