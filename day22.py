@@ -47,37 +47,24 @@ def part1():
     assert position == 2514
 
 
-seen = set()
-
-
-def cycle(size, position):
-    if position in seen:
-        raise Exception("cycle has already been called")
-    seen.add(position)
-
-    for line in data.split("\n"):
-        if line.startswith("deal into new stack"):
-            position = deal_into_new_stack(size, position)
-        elif line.startswith("deal with increment "):
-            line = line.replace("deal with increment ", "")
-            n = int(line.strip())
-            position = deal_with_increment_N(size, position, n)
-        elif line.startswith("cut "):
-            line = line.replace("cut ", "")
-            n = int(line.strip())
-            position = cut_N_cards(size, position, n)
-
-    return position
-
-
 def part2():
     size = 119315717514047
     position = 2020
-    for _ in range(101741582076661):
-        position = cycle(size, position)
+    for i in range(101741582076661):
+        for j, line in enumerate(data.split("\n")):
+            if line.startswith("deal into new stack"):
+                position = deal_into_new_stack(size, position)
+            elif line.startswith("deal with increment "):
+                line = line.replace("deal with increment ", "")
+                n = int(line.strip())
+                position = deal_with_increment_N(size, position, n)
+            elif line.startswith("cut "):
+                line = line.replace("cut ", "")
+                n = int(line.strip())
+                position = cut_N_cards(size, position, n)
 
     print(position)
 
 
-# part1()
+part1()
 part2()
