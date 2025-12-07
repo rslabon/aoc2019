@@ -15,47 +15,69 @@ with open("resources/day22.txt") as f:
     data = f.read().strip()
 
 
-def deal_into_new_stack(deck):
-    reversed_deck = deck[::-1]
-    return reversed_deck
+def deal_into_new_stack(size, position):
+    return size - position - 1
 
 
-def cut_N_cards(deck, n):
-    return deck[n:] + deck[0:n]
+def cut_N_cards(size, position, n):
+    if n >= 0:
+        return (size - n + position) % size
+    return (position + abs(n)) % size
 
 
-def deal_with_increment_N(deck, n):
-    new_deck = [None] * len(deck)
-    i = 0
-    j = 0
-    while j < len(deck):
-        new_deck[i] = deck[j]
-        deck[j] = None
-        i += n
-        i %= len(deck)
-        j += 1
-
-    return new_deck
+def deal_with_increment_N(size, position, n):
+    return (position * n) % size
 
 
 def part1():
-    deck = list(range(10007))
+    size = 10007
+    position = 2019
     for line in data.split("\n"):
         if line.startswith("deal into new stack"):
-            deck = deal_into_new_stack(deck)
+            position = deal_into_new_stack(size, position)
         elif line.startswith("deal with increment "):
             line = line.replace("deal with increment ", "")
             n = int(line.strip())
-            deck = deal_with_increment_N(deck, n)
+            position = deal_with_increment_N(size, position, n)
         elif line.startswith("cut "):
             line = line.replace("cut ", "")
             n = int(line.strip())
-            deck = cut_N_cards(deck, n)
+            position = cut_N_cards(size, position, n)
 
-    for position, card in enumerate(deck):
-        if card == 2019:
-            print(position)
-            break
+    assert position == 2514
 
 
-part1()
+seen = set()
+
+
+def cycle(size, position):
+    if position in seen:
+        raise Exception("cycle has already been called")
+    seen.add(position)
+
+    for line in data.split("\n"):
+        if line.startswith("deal into new stack"):
+            position = deal_into_new_stack(size, position)
+        elif line.startswith("deal with increment "):
+            line = line.replace("deal with increment ", "")
+            n = int(line.strip())
+            position = deal_with_increment_N(size, position, n)
+        elif line.startswith("cut "):
+            line = line.replace("cut ", "")
+            n = int(line.strip())
+            position = cut_N_cards(size, position, n)
+
+    return position
+
+
+def part2():
+    size = 119315717514047
+    position = 2020
+    for _ in range(101741582076661):
+        position = cycle(size, position)
+
+    print(position)
+
+
+# part1()
+part2()
