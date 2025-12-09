@@ -42,10 +42,7 @@ def computer(program, address, bus, stop_event):
 
 
 def part1():
-    bus = []
-    for i in range(50):
-        bus.append(deque([i]))
-
+    bus = [deque([i]) for i in range(50)]
     stop_event = threading.Event()
     threads = []
     for i in range(50):
